@@ -25,7 +25,7 @@ public class ModuleIntegrationTest extends TestVerticle
             assertThat(ar.result(), is(notNullValue()));
 
             // give some time for metrics to get collected
-            vertx.setTimer(1000L, id -> startTests());
+            vertx.setTimer(500L, id -> startTests());
         });
     }
 
@@ -45,7 +45,7 @@ public class ModuleIntegrationTest extends TestVerticle
 
                 testOneSource(jsonObject, client);
 
-            }, error -> fail(error.getMessage()), () -> testComplete());
+            }, error -> fail(error.getMessage()));
     }
 
     private void testOneSource(final JsonObject sources, final RxHttpClient client)
@@ -60,7 +60,7 @@ public class ModuleIntegrationTest extends TestVerticle
                 final JsonObject jsonObject = new JsonObject(buf.toString());
                 assertThat(jsonObject.getFieldNames().isEmpty(), is(false));
 
-            });
+            }, error -> fail(error.getMessage()), () -> testComplete());
     }
 
     @Test
