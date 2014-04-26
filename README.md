@@ -15,3 +15,8 @@ In dev mode:
 ## Building the module
 
     mvn clean package
+
+
+## Profiting
+
+After starting the module, browse: http://localhost:8080/
