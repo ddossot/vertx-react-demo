@@ -1,12 +1,12 @@
 
 package io.vertx.demo.react.integration.java;
 
+import static io.vertx.rxcore.RxSupport.mergeBuffers;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
-import static org.junit.Assert.fail;
 import static org.vertx.testtools.VertxAssert.assertThat;
+import static org.vertx.testtools.VertxAssert.fail;
 import static org.vertx.testtools.VertxAssert.testComplete;
-import io.vertx.rxcore.RxSupport;
 import io.vertx.rxcore.java.http.RxHttpClient;
 
 import org.junit.Test;
@@ -23,7 +23,9 @@ public class ModuleIntegrationTest extends TestVerticle
         container.deployModule(System.getProperty("vertx.modulename"), ar -> {
             assertThat(ar.succeeded(), is(true));
             assertThat(ar.result(), is(notNullValue()));
-            startTests();
+
+            // give some time for metrics to get collected
+            vertx.setTimer(1000L, id -> startTests());
         });
     }
 
@@ -34,11 +36,44 @@ public class ModuleIntegrationTest extends TestVerticle
             .setHost("localhost")
             .setPort(8080));
 
-        client.getNow("/api/sources")
-            .mapMany(resp -> resp.asObservable().reduce(RxSupport.mergeBuffers))
+        client.getNow("/api/metrics/sources")
+            .mapMany(resp -> resp.asObservable().reduce(mergeBuffers))
             .subscribe(buf -> {
+
                 final JsonObject jsonObject = new JsonObject(buf.toString());
                 assertThat(jsonObject.getFieldNames().isEmpty(), is(false));
+
+                testOneSource(jsonObject, client);
+
             }, error -> fail(error.getMessage()), () -> testComplete());
+    }
+
+    private void testOneSource(final JsonObject sources, final RxHttpClient client)
+    {
+        final String type = sources.getFieldNames().iterator().next();
+        final String name = sources.getArray(type).get(0);
+
+        client.getNow("/api/metrics/" + type + "/" + name)
+            .mapMany(resp -> resp.asObservable().reduce(mergeBuffers))
+            .subscribe(buf -> {
+
+                final JsonObject jsonObject = new JsonObject(buf.toString());
+                assertThat(jsonObject.getFieldNames().isEmpty(), is(false));
+
+            });
+    }
+
+    @Test
+    public void httpGetWebHomePage()
+    {
+        final RxHttpClient client = new RxHttpClient(vertx.createHttpClient()
+            .setHost("localhost")
+            .setPort(8080));
+
+        client.getNow("/").mapMany(resp -> resp.asObservable().reduce(mergeBuffers)).subscribe(buf -> {
+
+            assertThat(buf.toString().contains("</html>"), is(true));
+
+        }, error -> fail(error.getMessage()), () -> testComplete());
     }
 }

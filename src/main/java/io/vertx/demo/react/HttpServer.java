@@ -51,16 +51,16 @@ public class HttpServer
             });
 
         routeMatcher.get(
-            "/api/metrics/:type/:source",
+            "/api/metrics/:type/:name",
             req -> {
                 final String type = req.params().get("type");
-                final String source = req.params().get("source");
+                final String name = req.params().get("name");
 
                 subscribeAndRespondJson(
                     rx.eventBus()
                         .<JsonObject, JsonObject> send(metricsAddress,
                             new JsonObject().putString("action", type))
-                        .map(msg -> msg.body().getObject(source)), req);
+                        .map(msg -> msg.body().getObject(name)), req);
             });
 
         routeMatcher.getWithRegEx(".*", req -> {
