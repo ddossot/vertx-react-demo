@@ -45,5 +45,8 @@ public class MainVerticle extends Verticle
         final RxVertx rx = new RxVertx(vertx);
 
         new FakeDataGenerator(config, rx);
+        new HttpServer(config, rx);
+
+        container.logger().info("Vert.x React Demo is running");
     }
 }
