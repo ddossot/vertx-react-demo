@@ -1,0 +1,8 @@
+{
+    "metrics": {
+        "address": "jmx.metrics"
+    },
+    "data.generator": {
+        "period.millis": 100  
+    }
+}

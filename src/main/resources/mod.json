@@ -1,0 +1,5 @@
+{
+  "includes":"io.vertx~mod-rxvertx~1.0.0-beta2",
+  "main":"io.vertx.demo.react.MainVerticle",
+  "auto-redeploy": true
+}
