@@ -25,7 +25,7 @@ public class ModuleIntegrationTest extends TestVerticle
             assertThat(ar.result(), is(notNullValue()));
 
             // give some time for metrics to get collected
-            vertx.setTimer(500L, id -> startTests());
+            vertx.setTimer(1000L, id -> startTests());
         });
     }
 

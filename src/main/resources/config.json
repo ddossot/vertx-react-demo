@@ -4,9 +4,13 @@
         "port": 8080
     },
     "metrics": {
-        "address": "jmx.metrics"
+        "address": "jmx.metrics",
+        "updates.address": "jmx.metrics.updates",
+        "broadcast.period.millis": 1000,
+        "broadcast.base.address": "jmx.metrics.values"
     },
     "data.generator": {
-        "period.millis": 100  
+        "min.millis": 50,
+        "max.millis": 500
     }
 }
