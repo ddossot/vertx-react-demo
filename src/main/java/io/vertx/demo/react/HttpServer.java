@@ -5,6 +5,7 @@ import static rx.Observable.from;
 import static rx.Observable.zip;
 import io.vertx.rxcore.java.RxVertx;
 import io.vertx.rxcore.java.http.RxHttpServer;
+import io.vertx.rxcore.java.http.RxServerWebSocket;
 
 import org.vertx.java.core.http.HttpServerRequest;
 import org.vertx.java.core.http.RouteMatcher;
@@ -12,6 +13,7 @@ import org.vertx.java.core.json.JsonArray;
 import org.vertx.java.core.json.JsonObject;
 
 import rx.Observable;
+import rx.Subscription;
 
 public class HttpServer
 {
@@ -26,9 +28,10 @@ public class HttpServer
         final RxHttpServer httpServer = rx.createHttpServer();
         httpServer.http().subscribe(req -> routeMatcher.handle(req));
 
-        final Integer httpPort = conf.getObject("http").getInteger("port");
-        final String httpHost = conf.getObject("http").getString("host");
+        httpServer.websocket().subscribe(ws -> handleWebSocket(ws, conf, rx));
 
+        final int httpPort = conf.getObject("http").getInteger("port");
+        final String httpHost = conf.getObject("http").getString("host");
         httpServer.coreHttpServer().listen(httpPort, httpHost);
     }
 
@@ -79,6 +82,19 @@ public class HttpServer
         });
 
         return routeMatcher;
+    }
+
+    private void handleWebSocket(final RxServerWebSocket ws, final JsonObject config, final RxVertx rx)
+    {
+        final String metricsPath = ws.path().substring("/streams".length()).replace('/', '.');
+
+        final String broadcastBaseAddress = config.getObject("metrics").getString("broadcast.base.address");
+
+        final Subscription subscription = rx.eventBus()
+            .<JsonObject> registerHandler(broadcastBaseAddress + metricsPath)
+            .subscribe(m -> ws.writeTextFrame(m.body().toString()));
+
+        ws.closeHandler($ -> subscription.unsubscribe());
     }
 
     private static Observable<JsonObject> observeMetricsSource(final String metricsAddress,
