@@ -11,3 +11,4 @@ build/
 target/
 
 mods/
+/client/node_modules/
