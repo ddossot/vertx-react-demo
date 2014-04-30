@@ -1,0 +1,3 @@
+#buster-server: ./run-buster-server.sh
+compile: npm run start
+server: python -m SimpleHTTPServer 9090

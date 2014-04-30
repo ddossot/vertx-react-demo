@@ -1,0 +1,35 @@
+{
+  "name": "rxjs-demo",
+  "version": "0.0.0",
+  "description": "A demo of rxjs and vert.x",
+  "main": "index.js",
+  "author": "Tavis Rudd",
+  "license": "MIT",
+  "scripts": {
+    "start": "STATIC_ROOT=./static watchify -o browser-bundle.js -v -d .",
+    "devbuild": "STATIC_ROOT=./static NODE_ENV=production browserify -o browser-bundle.js .",
+    "build": "STATIC_ROOT=./static NODE_ENV=production browserify . | uglifyjs -cm > browser-bundle.min.js",
+    "collect-static": "collect-static . ./static",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "rxjs": "^1.0.10621",
+    "react": "^0.10.0"
+  },
+  "devDependencies": {
+    "coffee-script": "^1.7.1",
+    "browserify": "^3.44.2",
+    "envify": "^1.2.1",
+    "reactify": "^0.13.1",
+    "uglifyjs": "^2.3.6",
+    "watchify": "^0.8.2",
+    "statics": "^0.1.0",
+    "uglify-js": "^2.4.13"
+  },
+  "browserify": {
+    "transform": [
+      "reactify",
+      "envify"
+    ]
+  }
+}
