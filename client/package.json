@@ -2,7 +2,7 @@
   "name": "rxjs-demo",
   "version": "0.0.0",
   "description": "A demo of rxjs and vert.x",
-  "main": "index.js",
+  "main": "index.coffee",
   "author": "Tavis Rudd",
   "license": "MIT",
   "scripts": {
@@ -24,12 +24,14 @@
     "uglifyjs": "^2.3.6",
     "watchify": "^0.8.2",
     "statics": "^0.1.0",
-    "uglify-js": "^2.4.13"
+    "uglify-js": "^2.4.13",
+    "coffeeify": "^0.6.0"
   },
   "browserify": {
     "transform": [
       "reactify",
-      "envify"
+      "envify",
+      "coffeeify"
     ]
   }
 }
