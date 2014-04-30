@@ -12,3 +12,7 @@ target/
 
 mods/
 /client/node_modules/
+/client/tmp/
+/client/browser-bundle.js
+/client/browser-bundle.min.js
+/client/npm-debug.log
