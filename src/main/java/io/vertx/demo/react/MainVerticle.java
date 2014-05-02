@@ -47,7 +47,10 @@ public class MainVerticle extends Verticle
         new FakeDataGenerator(config, rx);
         new MetricsUpdatesRebroadcaster(config, rx);
         new HttpServer(config, rx);
+        final String host = config.getObject("http").getString("host");
+        final Integer port = config.getObject("http").getInteger("port");
 
-        container.logger().info("Vert.x React Demo is running");
+        container.logger().info(String.format("Vert.x/Rx/React demo running on %s:%d", host, port)); 
+
     }
 }
