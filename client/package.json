@@ -25,7 +25,9 @@
     "watchify": "^0.8.2",
     "statics": "^0.1.0",
     "uglify-js": "^2.4.13",
-    "coffeeify": "^0.6.0"
+    "coffeeify": "^0.6.0",
+    "buster": "^0.7.12",
+    "buster-coffee": "^0.1.4"
   },
   "browserify": {
     "transform": [
