@@ -1,20 +1,34 @@
 
-package io.vertx.demo.react.integration.java;
+package io.vertx.demo.react.integration;
 
-import static io.vertx.rxcore.RxSupport.mergeBuffers;
+import static io.netty.buffer.Unpooled.wrappedBuffer;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.vertx.testtools.VertxAssert.assertThat;
 import static org.vertx.testtools.VertxAssert.fail;
 import static org.vertx.testtools.VertxAssert.testComplete;
+import io.netty.buffer.ByteBuf;
 import io.vertx.rxcore.java.http.RxHttpClient;
 
 import org.junit.Test;
+import org.vertx.java.core.buffer.Buffer;
 import org.vertx.java.core.json.JsonObject;
 import org.vertx.testtools.TestVerticle;
 
+import rx.util.functions.Func2;
+
 public class ModuleIntegrationTest extends TestVerticle
 {
+    private static Func2<Buffer, Buffer, Buffer> MERGE_BUFFERS = new Func2<Buffer, Buffer, Buffer>()
+    {
+        @Override
+        public Buffer call(final Buffer b1, final Buffer b2)
+        {
+            final ByteBuf merged = wrappedBuffer(b1.getByteBuf(), b2.getByteBuf());
+            return new Buffer(merged);
+        }
+    };
+
     @Override
     public void start()
     {
@@ -37,7 +51,7 @@ public class ModuleIntegrationTest extends TestVerticle
             .setPort(8080));
 
         client.getNow("/api/metrics/sources")
-            .mapMany(resp -> resp.asObservable().reduce(mergeBuffers))
+            .mapMany(resp -> resp.asObservable().reduce(MERGE_BUFFERS))
             .subscribe(buf -> {
 
                 final JsonObject jsonObject = new JsonObject(buf.toString());
@@ -54,7 +68,7 @@ public class ModuleIntegrationTest extends TestVerticle
         final String name = sources.getArray(type).get(0);
 
         client.getNow("/api/metrics/" + type + "/" + name)
-            .mapMany(resp -> resp.asObservable().reduce(mergeBuffers))
+            .mapMany(resp -> resp.asObservable().reduce(MERGE_BUFFERS))
             .subscribe(buf -> {
 
                 final JsonObject jsonObject = new JsonObject(buf.toString());
@@ -70,7 +84,7 @@ public class ModuleIntegrationTest extends TestVerticle
             .setHost("localhost")
             .setPort(8080));
 
-        client.getNow("/").mapMany(resp -> resp.asObservable().reduce(mergeBuffers)).subscribe(buf -> {
+        client.getNow("/").mapMany(resp -> resp.asObservable().reduce(MERGE_BUFFERS)).subscribe(buf -> {
 
             assertThat(buf.toString().contains("</html>"), is(true));
 
