@@ -6,3 +6,83 @@
     <script src="browser-bundle.js"></script>
   </body>
 </html>
+<!-- 
+ <script language="javascript" type="text/javascript">
+
+  var wsUri = "ws://localhost:8080/streams/meters/requests";
+  var output;
+  var count = 0;
+
+  function init()
+  {
+    output = document.getElementById("output");
+    testWebSocket();
+  }
+
+  function testWebSocket()
+  {
+    websocket = new WebSocket(wsUri);
+    websocket.onopen = function(evt) { onOpen(evt) };
+    websocket.onclose = function(evt) { onClose(evt) };
+    websocket.onmessage = function(evt) { onMessage(evt) };
+    websocket.onerror = function(evt) { onError(evt) };
+  }
+
+  function onOpen(evt)
+  {
+    writeToScreen("CONNECTED: " + wsUri);
+  }
+
+  function onClose(evt)
+  {
+    writeToScreen("DISCONNECTED");
+  }
+
+  function onMessage(evt)
+  {
+    writeToScreen('<span style="color: blue;">RECEIVED: ' + evt.data+'</span>');
+
+    count++;
+    if (count > 5) {
+      websocket.close();
+    }
+  }
+
+  function onError(evt)
+  {
+    writeToScreen('<span style="color: red;">ERROR:</span> ' + evt.data);
+  }
+
+  function doSend(message)
+  {
+    writeToScreen("SENT: " + message); 
+    websocket.send(message);
+  }
+
+  function writeToScreen(message)
+  {
+    var pre = document.createElement("p");
+    pre.style.wordWrap = "break-word";
+    pre.innerHTML = message;
+    output.appendChild(pre);
+  }
+
+  window.addEventListener("load", init, false);
+
+</script>
+  <a href="https://github.com/reactivemanifesto"><img src="img/react-logo.png" /></a>
+  <h1>Vert.x React Demo</h1>
+  <h2>REST API</h2>
+  <ul>
+   <li><a href="/api/metrics/sources">/api/metrics/sources</a></li>
+   <li><a href="/api/metrics/meters/requests">/api/metrics/meters/requests</a></li>
+   <li><a href="/api/metrics/histograms/responseTimes">/api/metrics/histograms/responseTimes</a></li>
+  </ul>
+  <h2>WebSockets</h2>
+  <ul>
+   <li>ws://localhost:8080/streams/meters/requests</li>
+   <li>ws://localhost:8080/streams/metrics/histograms/responseTimes</li>
+  </ul>
+  <h2>WebSocket Test</h2>
+  <div id="output"></div>
+ -->
