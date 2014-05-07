@@ -1,4 +1,4 @@
 buster-server: ./run-buster-server.sh
-compile: npm run start
+compile: npm install && npm run start
 vertx-server: mvn -f ../pom.xml package vertx:runMod
 simple-httpd: python -m SimpleHTTPServer 9090
