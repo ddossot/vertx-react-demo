@@ -13,11 +13,10 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {
-    "rxjs": "^1.0.10621",
-    "react": "^0.10.0"
+    "coffee-script": "^1.7.1"
   },
   "devDependencies": {
-    "coffee-script": "^1.7.1",
+    "react": "^0.10.0",
     "browserify": "^3.44.2",
     "envify": "^1.2.1",
     "reactify": "^0.13.1",
@@ -27,7 +26,11 @@
     "uglify-js": "^2.4.13",
     "coffeeify": "^0.6.0",
     "buster": "^0.7.12",
-    "buster-coffee": "^0.1.4"
+    "buster-coffee": "^0.1.4",
+    "rx": "^2.2.20",
+    "rx-dom": "^2.0.7",
+    "underscore": "^1.6.0",
+    "lodash": "^2.4.1"
   },
   "browserify": {
     "transform": [
