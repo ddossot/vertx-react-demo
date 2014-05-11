@@ -9,6 +9,8 @@ import org.vertx.java.platform.Verticle;
 
 public class MainVerticle extends Verticle
 {
+    private static final String METRICS_MODULE = "com.bloidonia~mod-metrics~1.0.1";
+
     @Override
     public void start()
     {
@@ -28,16 +30,22 @@ public class MainVerticle extends Verticle
     {
         final JsonObject config = new JsonObject(buffer.toString());
 
-        container.deployModule("com.bloidonia~mod-metrics~1.0.1", config.getObject("metrics"), ar -> {
-            if (ar.succeeded())
-            {
-                start(config);
-            }
-            else
-            {
-                container.logger().fatal("Failed to deploy metrics module", ar.cause());
-            }
-        });
+        container.deployModule(
+            METRICS_MODULE,
+            config.getObject("metrics"),
+            ar -> {
+                if (ar.succeeded())
+                {
+                    container.logger().fatal("Deployed: " + METRICS_MODULE + " with id: " + ar.result(),
+                        ar.cause());
+
+                    start(config);
+                }
+                else
+                {
+                    container.logger().fatal("Failed to deploy: " + METRICS_MODULE, ar.cause());
+                }
+            });
     }
 
     private void start(final JsonObject config)
@@ -50,7 +58,6 @@ public class MainVerticle extends Verticle
         final String host = config.getObject("http").getString("host");
         final Integer port = config.getObject("http").getInteger("port");
 
-        container.logger().info(String.format("Vert.x/Rx/React demo running on %s:%d", host, port)); 
-
+        container.logger().info(String.format("Vert.x/Rx/React demo running on %s:%d", host, port));
     }
 }

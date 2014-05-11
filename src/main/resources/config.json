@@ -11,6 +11,8 @@
     },
     "data.generator": {
         "min.millis": 50,
-        "max.millis": 500
+        "max.millis": 500,
+        "burst.every.millis": 15000,
+        "burst.size": 50
     }
 }

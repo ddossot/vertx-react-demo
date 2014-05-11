@@ -20,35 +20,60 @@ public class FakeDataGenerator
 
     private final static Random RANDOM = new Random();
 
+    private final RxVertx rx;
+    private final String metricsAddress, metricsUpdatesAddress;
+    private final int minMillis, maxMillis, burstEveryMillis, burstSize;
+
+    private volatile long nextBurstTimestamp;
+
     public FakeDataGenerator(final JsonObject config, final RxVertx rx)
     {
-        final String metricsAddress = config.getObject("metrics").getString("address");
-        final String metricsUpdatesAddress = config.getObject("metrics").getString("updates.address");
+        this.rx = rx;
 
-        final int minMillis = config.getObject("data.generator").getInteger("min.millis");
-        final int maxMillis = config.getObject("data.generator").getInteger("max.millis");
+        metricsAddress = config.getObject("metrics").getString("address");
+        metricsUpdatesAddress = config.getObject("metrics").getString("updates.address");
 
-        scheduleNextEvent(metricsAddress, metricsUpdatesAddress, minMillis, maxMillis, rx);
+        minMillis = config.getObject("data.generator").getInteger("min.millis");
+        maxMillis = config.getObject("data.generator").getInteger("max.millis");
+        burstEveryMillis = config.getObject("data.generator").getInteger("burst.every.millis");
+        burstSize = config.getObject("data.generator").getInteger("burst.size");
+
+        setNextBurstTimeStamp();
+
+        scheduleNextEvent();
     }
 
-    private void scheduleNextEvent(final String metricsAddress,
-                                   final String metricsUpdatesAddress,
-                                   final int minMillis,
-                                   final int maxMillis,
-                                   final RxVertx rx)
+    private void scheduleNextEvent()
     {
         final int waitMillis = minMillis + RANDOM.nextInt(maxMillis - minMillis);
 
         rx.setTimer(waitMillis).subscribe(timerId -> {
-            generateFakeData(metricsAddress, metricsUpdatesAddress, rx);
-            scheduleNextEvent(metricsAddress, metricsUpdatesAddress, minMillis, maxMillis, rx);
+            generateFakeData();
+            scheduleNextEvent();
         });
     }
 
-    private void generateFakeData(final String address, final String metricsUpdatesAddress, final RxVertx rx)
+    private void generateFakeData()
+    {
+        final long timestamp = System.currentTimeMillis();
+        final boolean shouldBurst = timestamp >= nextBurstTimestamp;
+
+        final int eventCount = shouldBurst ? burstSize : 1;
+        for (int i = 0; i < eventCount; i++)
+        {
+            sendFakeDataEvents();
+        }
+
+        if (shouldBurst)
+        {
+            setNextBurstTimeStamp();
+        }
+    }
+
+    private void sendFakeDataEvents()
     {
         rx.eventBus()
-            .send(address, REQUESTS_METER_MARK_MESSAGE)
+            .send(metricsAddress, REQUESTS_METER_MARK_MESSAGE)
             .subscribe(m -> rx.eventBus().send(metricsUpdatesAddress, REQUESTS_METER_UPDATED_MESSAGE));
 
         final JsonObject responseTimesUpdateMessage = new JsonObject().putString("action", "update")
@@ -56,8 +81,13 @@ public class FakeDataGenerator
             .putNumber("n", 25 + RANDOM.nextInt(475));
 
         rx.eventBus()
-            .send(address, responseTimesUpdateMessage)
+            .send(metricsAddress, responseTimesUpdateMessage)
             .subscribe(
                 m -> rx.eventBus().send(metricsUpdatesAddress, RESPONSE_TIMES_HISTOGRAM_UPDATED_MESSAGE));
+    }
+
+    private void setNextBurstTimeStamp()
+    {
+        nextBurstTimestamp = System.currentTimeMillis() + burstEveryMillis;
     }
 }

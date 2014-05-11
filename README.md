@@ -9,7 +9,7 @@
 
 In dev mode:
 
-    mvn clean package vertx:runMod
+    mvn clean compile vertx:runMod
 
 Or build the module (below) and run it on your local Vert.x 2.1RC3.
 
