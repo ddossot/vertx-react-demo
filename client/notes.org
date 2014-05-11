@@ -8,6 +8,30 @@
 - enable on/off control of the metrics ws subscription
 
 
+** talk focus
+
+Reading the http://www.reactivemanifesto.org/ I think everything I
+want to say falls under the 'loose coupling' benefits of 'going
+reactive'. I'll talk primarily about the benefits of separating
+intent/event and implementation/reaction from simplicity, flexibility,
+introspection and debugging perspectives. E.g. how it reduces control
+flow complexity and keeps what remains separate from the declaritive
+core of the domain/ui models. I'll also mention location
+transparency - something Roman and I highlighted in our talk last year
+at Polyglot - and temporal transformations on events streams
+(throttling, sampling, etc.).
+
+I won't talk about scalability, low-latency, 'responsiveness',
+throughput, or resilience. All yours :)
+** rough outline
+- WTF is 'reactive': snippet from Eric Meier's reactconf talk
+- Overview of Reactive Manifesto and my focus on 'loose coupling'
+- architect your applications - both domain code and UIs - around
+  decoupled event streams instead of directly coupling the
+  implementation/reaction to the event sources with callbacks.
+  Jesus Facepalm
+- Reactive Extensions are like jquery for event streams
+- ...
 ** very rough initial brainstorm / notes on my talk:
 - what is an event?
 - define effects
