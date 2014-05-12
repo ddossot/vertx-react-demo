@@ -31,7 +31,34 @@ throughput, or resilience. All yours :)
   implementation/reaction to the event sources with callbacks.
   Jesus Facepalm
 - Reactive Extensions are like jquery for event streams
+- it is a 'language' for composing larger event streams out of
+  primitive operations, means of combination and means of abstraction
+  (Sussman's talk:
+  http://video.mit.edu/watch/an-electrical-engineering-view-of-a-mechanical-watch-9035/)
+  The objects formed from composing primitive elements behave and can
+  be composed just like the primitives.
 - ...
+- gears example with flatMap
+  information flow (sender, message, channel, receiver, feedback)
+- generation of synthetic events
+  quickcheck style testing
+- record / replay example
+- relationship to frp / dataflow programming 
+  declarative expression of dependencies & relationships
+  building blocks: 
+  1) event streams 
+  2) signals / behaviours / reactive values (Conal: values over continuous time)
+     discrete occurences over time
+     Properties in bacon.js
+     cells in spreadsheets
+- show dependence on subscription time re Hot observables
+  mention Bacon.js
+
+- examples
+- vs Knockout & bacon.js
+- vs promises?
+- with angular, react, backbone, ember, etc.??
+- server side with node.js?
 ** very rough initial brainstorm / notes on my talk:
 - what is an event?
 - define effects
@@ -40,6 +67,8 @@ throughput, or resilience. All yours :)
 - easy to understand, compose, debug and much more
 - don't think of Rx as a way to chain callbacks!
 - and for fuck's sake don't design by callback chaining
+  mvc / data binding = FAIL
+  50 times no slide sequence
 - better metaphors:
   - it is a means to plumb event pipelines together
   - treat async events like collections
@@ -52,7 +81,10 @@ throughput, or resilience. All yours :)
 - system state is a derived from events (ui, network, whatever) that have occurred
 - learn to think in state machines
 - frp / uis
+- higher order event streams (composed event streams)
+  a bit like higher order functions
 - deterministic replay of non-deterministic original event stream
+- mention Ix library
 - a bit about React.js and how it's V-only philosophy fits well with what I've said
   and with Rx
   http://facebook.github.io/react/docs/thinking-in-react.html
