@@ -6,7 +6,7 @@
   "author": "Tavis Rudd",
   "license": "MIT",
   "scripts": {
-    "start": "STATIC_ROOT=./static NODE_ENV=production watchify -o build/browser-bundle.js -v -d .",
+    "watch": "STATIC_ROOT=./static NODE_ENV=production watchify -o build/browser-bundle.js -v -d .",
     "devbuild": "STATIC_ROOT=./static NODE_ENV=production browserify -o build/browser-bundle.js .",
     "build": "STATIC_ROOT=./static NODE_ENV=production browserify . | uglifyjs -cm > build/browser-bundle.min.js",
     "collect-static": "collect-static . ./static",
