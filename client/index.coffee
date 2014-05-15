@@ -31,6 +31,7 @@ window.app = app =
     # keep track for disposing them later: off/on
     requestsWS: null
     responseTimesWS: null
+  demos: {}
   uiRoot: null
 
 logWith = (label) ->
@@ -62,6 +63,31 @@ observeWebSocket = (url) ->
     if ws.readyState == WebSocket.OPEN
       ws.send(data)
   Subject.create(observer, observable)
+
+MouseMoveWidget = React.createClass
+  getInitialState: ->
+    startpos: {x: 0, y: 0}
+    dx: 0
+    dy: 0
+    target: ''
+  render: ->
+      (R.div {style: {float: "right"}},
+        [(R.h2 {}, "Mouse drag demo"),
+        "start pos: #{@state.startpos.x} #{@state.startpos.y}",
+        R.br {},
+        "target: #{@state.target}",
+        R.br {},
+        "dx: #{@state.dx}",
+        R.br {},
+        "dy: #{@state.dy}",
+        R.br {},
+        ])
+
+  componentWillMount: ->
+    @subscription = app.events.mouseDemo.subscribe(@setState.bind(@))
+
+  componentWillUnmount: ->
+    @subscription.dispose()
 
 RequestsWidget = React.createClass
   getInitialState: ->
@@ -98,7 +124,8 @@ RequestsWidget = React.createClass
 
 init_ui = ->
   component = R.div {},
-    RequestsWidget({})
+    RequestsWidget({}),
+    MouseMoveWidget()
 
   app.uiRoot = React.renderComponent(component, document.getElementById('app'));
 
@@ -133,26 +160,17 @@ mouseDrags = (elem) ->
       dx: moveEv.clientX - startpos.x
       dy: moveEv.clientY - startpos.y
 
-# mouseDeltas = mouseMoves.skip(1).zip(mouseMoves, (l, r) ->
-#   dx: l.clientX - r.clientX,
-#   dy: l.clientY - r.clientY
-#   x: l.clientX,
-#   y: l.clientY)
+app.demos.mouseMove = ->
+  mouseDrags(document).subscribe (drag) ->
+    app.events.mouseDemo.onNext(drag)
+  mouseUp.subscribe () ->
+    app.events.mouseDemo.onNext(
+      startpos: {x: 0, y: 0}
+      target: ''
+      dx: 0
+      dy: 0)
 
-# mouseDeltasTotal = mouseMoves.scan(
-#   {dx: 0, dy: 0}, # initial acc'umulator
-#   (acc, ev) ->
-#     dx: acc.dx + ev.dx
-#     dy: acc.dy + ev.dy
-#     x: ev.clientX
-#     y: ev.clientY
-#     )
-# #mouseDrags = mouseDown.selectMany (md) -> mouseDeltasTotal.takeUntil(mouseUp)
-
-mouseMoveDemo = ->
-  mouseDrags(document).subscribe((drag) -> console.log(drag))
-
-timerDemo = () ->
+app.demos.timer = () ->
   timerOn = true
   timerSwitch = new Subject()
   Observable
@@ -164,23 +182,20 @@ timerDemo = () ->
   Observable.fromEvent(document, 'click')
     .subscribe ->
       timerOn = !timerOn
+      if timerOn
+        console.log("timer on")
+      else
+        console.log("timer off")
       timerSwitch.onNext(timerOn)
 
 stackTrace = () -> new Error().stack
-toAsyncDemo = () ->
+app.demos.toAsync = () ->
   f = (arg) ->
     "async: #{arg} #{stackTrace()}"
   fasync = Observable.toAsync(f)
   Observable.interval(1000).flatMap(fasync).subscribe(log)
 
-behavioursDemo = () ->
-  sub = new Rx.BehaviorSubject(42)
-  sub.onNext(2)
-  sub.onNext(3)
-  sub.subscribe(log)
-  sub.onNext(4)
-
-replayDemo = () ->
+app.demos.replay = () ->
   sub = new Rx.ReplaySubject()
   # bufferSize, windowSize, scheduler
   sub.onNext(2)
@@ -188,22 +203,29 @@ replayDemo = () ->
   sub.subscribe(log)
   sub.onNext(4)
 
-backpressureDemos = () ->
+app.demos.behaviours = () ->
+  sub = new Rx.BehaviorSubject(42)
+  # same as `sub = new Rx.ReplaySubject(1); sub.onNext(42)`
+  sub.onNext(2)
+  sub.onNext(3)
+  sub.subscribe(log)
+  sub.onNext(4)
+
+app.demos.backpressure = () ->
   source = Observable.range(0, 10).timeInterval().controlled()
   source.subscribe(logWith("controlled:"))
   source.request(4)
   source.request(4)
 
-
 onload = ->
   init_ui()
-  mouseMoveDemo()
+  app.demos.mouseMove()
   init_websockets()
-  #replayDemo()
   #log("--")
-  #behavioursDemo()
-  #backpressureDemos()
-  #timerDemo()
-#  toAsyncDemo()
-
+  #app.demos.behaviours()
+  #app.demos.replay()
+  #app.demos.backpressures()
+  #app.demos.timer()
+  #app.demos.toAsync()
+#
 window.addEventListener("load", onload, false)
