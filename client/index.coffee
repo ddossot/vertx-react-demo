@@ -74,7 +74,7 @@ wsurl = (path) ->
   wsport = "8080" #document.location.port
   "ws://#{host}:#{wsport}#{path}"
 
-demos.metricsWebsockets = (config, eventSources) ->
+demos.metricsWebsockets = (config, eventSubjects) ->
   url = (endpoint_name) ->
     url0 = config.wsAPI[endpoint_name]
     if url0[0] == "/"
@@ -89,10 +89,11 @@ demos.metricsWebsockets = (config, eventSources) ->
       d = _.mapValues(d, (v) -> v.toFixed(2))
       d.count = Math.round(d.count)
       d)
-    .subscribe((e) -> eventSources.requests.onNext(e))
+    .subscribe((e) -> eventSubjects.requests.onNext(e))
+
   observeWebSocket(url("responseTimes"))
     .sample(500)
-    .subscribe((e) -> eventSources.responseTimes.onNext(e))
+    .subscribe((e) -> eventSubjects.responseTimes.onNext(e))
 
 ################################################################################
 # additional Observable event sources demos included in presentation
@@ -116,19 +117,19 @@ mouseDragResetEv =
   dx: 0
   dy: 0
 
-demos.mouseDrags = (eventSources) ->
+demos.mouseDrags = (eventSubjects) ->
   dragsSource = mouseDrags(document)
-  dragsSource.subscribe (drag) -> eventSources.mouseDrags.onNext(drag)
+  dragsSource.subscribe (drag) -> eventSubjects.mouseDrags.onNext(drag)
   dragsSource.subscribe(logAllObserver('drags'))
-  mouseUp.subscribe () -> eventSources.mouseDrags.onNext(mouseDragResetEv)
+  mouseUp.subscribe () -> eventSubjects.mouseDrags.onNext(mouseDragResetEv)
 
-demos.timer = (eventSources) ->
+demos.timer = (eventSubjects) ->
   ticks = Observable
     .interval(1000) # ms
     .timeInterval()
-    .pausable(eventSources.timerSwitch)
+    .pausable(eventSubjects.timerSwitch)
     .pluck("value")
-  ticks.subscribe((tick) -> eventSources.timer.onNext(tick))
+  ticks.subscribe((tick) -> eventSubjects.timer.onNext(tick))
   ticks.subscribe(logAllObserver('timer'))
 
 ################################################################################
@@ -248,11 +249,11 @@ TimerWidget = React.createClass
     #@setState(active: !@state.active)
     #@props.timerSwitch.onNext(@state.active)
 
-initUI = (eventSources) ->
+initUI = (eventSubjects) ->
   rootComponent = R.div {},
-    RequestsWidget(events: eventSources.requests),
-    MouseDragWidget(events: eventSources.mouseDrags),
-    TimerWidget(events: eventSources.timer, timerSwitch: eventSources.timerSwitch)
+    RequestsWidget(events: eventSubjects.requests),
+    MouseDragWidget(events: eventSubjects.mouseDrags),
+    TimerWidget(events: eventSubjects.timer, timerSwitch: eventSubjects.timerSwitch)
   React.renderComponent(rootComponent, document.getElementById('app'))
 
 
@@ -264,7 +265,7 @@ onload = ->
   demos.mouseDrags(app.events)
   demos.timer(app.events)
   demos.metricsWebsockets(app.config, app.events)
-  app.events.responseTimes.subscribe(logAllObserver('responseTimes'))
+  #app.events.responseTimes.subscribe(logAllObserver('responseTimes'))
   log('loaded')
 
 window.addEventListener("load", onload, false)
