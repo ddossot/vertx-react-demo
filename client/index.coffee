@@ -57,6 +57,9 @@ window.app = app =
      responseTimes: "/streams/metrics/histograms/responseTimes"
   events:
     # Rx.Subjects to decouple UI from event sources
+    # Think of these as the ports on a switchboard
+    # http://makemusicals.com/wp-content/uploads/2011/11/switchboard1.jpg
+    # They are a layer of indirection between the source of events and the consumers.
     timer: new Subject()
     timerSwitch: new Subject()
     mouseDrags: new Subject()
@@ -208,7 +211,7 @@ RequestsWidget = React.createClass
       R.br {},
       'count: ' + @state.count,
       R.br {},
-      'mean: ' + @state.mean, ''
+      'mean: ' + @state.mean, '' # trailing space required for some reason
 
 MouseDragWidget = React.createClass
   mixins: [ReactRxMixin]
