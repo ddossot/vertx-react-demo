@@ -2,7 +2,9 @@
  <head>
  <script language="javascript" type="text/javascript">
 
-  var wsUri = "ws://localhost:8080/streams/meters/requests";
+  var host = document.location.hostname;
+  var port = document.location.port;
+  var wsUri = "ws://" + host + ":" + port + "/streams/meters/requests";
   var output;
   var count = 0;
 
